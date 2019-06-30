@@ -8,6 +8,7 @@ const path = require('path');
 const multer = require('multer');
 
 // importing resources:
+const SETUP = require('./SETUP');
 const feedRouter = require('./routes/feedRouter');
 const authRouter = require('./routes/authRouter');
 
@@ -62,7 +63,7 @@ app.use((err, req, res, nxt) => {
 });
 
 mongoose
-  .connect('mongodb+srv://nodeApp:12345@mdbtest-enper.gcp.mongodb.net/nodejs_app_api', { useNewUrlParser: true })
+  .connect(SETUP.MONGODB_URI, { useNewUrlParser: true })
   .then(res => {
     console.log('-> Mongoose Connection OK!');
     console.log('-> starting server on port 8080');
