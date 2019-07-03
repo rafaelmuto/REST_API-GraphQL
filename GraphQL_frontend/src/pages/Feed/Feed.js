@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import openSocket from 'socket.io-client';
 
 import Post from '../../components/Feed/Post/Post';
 import Button from '../../components/Button/Button';
@@ -41,45 +40,7 @@ class Feed extends Component {
 
     this.loadPosts();
     const socket = openSocket('http://localhost:8080');
-    socket.on('posts', data => {
-      if (data.action === 'create') {
-        this.addPost(data.post);
-      } else if (data.action === 'update') {
-        this.updatePost(data.post);
-      } else if (data.action === 'delete') {
-        this.loadPosts();
-      }
-    });
   }
-
-  addPost = post => {
-    this.setState(prevState => {
-      const updatedPosts = [...prevState.posts];
-      if (prevState.postPage === 1) {
-        if (prevState.posts.length >= 2) {
-          updatedPosts.pop();
-        }
-        updatedPosts.unshift(post);
-      }
-      return {
-        posts: updatedPosts,
-        totalPosts: prevState.totalPosts + 1
-      };
-    });
-  };
-
-  updatePost = post => {
-    this.setState(prevState => {
-      const updatedPosts = [...prevState.posts];
-      const updatedPostIndex = updatedPosts.findIndex(p => p._id === post._id);
-      if (updatedPostIndex > -1) {
-        updatedPosts[updatedPostIndex] = post;
-      }
-      return {
-        posts: updatedPosts
-      };
-    });
-  };
 
   loadPosts = direction => {
     if (direction) {
@@ -263,22 +224,10 @@ class Feed extends Component {
     return (
       <Fragment>
         <ErrorHandler error={this.state.error} onHandle={this.errorHandler} />
-        <FeedEdit
-          editing={this.state.isEditing}
-          selectedPost={this.state.editPost}
-          loading={this.state.editLoading}
-          onCancelEdit={this.cancelEditHandler}
-          onFinishEdit={this.finishEditHandler}
-        />
+        <FeedEdit editing={this.state.isEditing} selectedPost={this.state.editPost} loading={this.state.editLoading} onCancelEdit={this.cancelEditHandler} onFinishEdit={this.finishEditHandler} />
         <section className="feed__status">
           <form onSubmit={this.statusUpdateHandler}>
-            <Input
-              type="text"
-              placeholder="Your status"
-              control="input"
-              onChange={this.statusInputChangeHandler}
-              value={this.state.status}
-            />
+            <Input type="text" placeholder="Your status" control="input" onChange={this.statusInputChangeHandler} value={this.state.status} />
             <Button mode="flat" type="submit">
               Update
             </Button>
@@ -295,28 +244,11 @@ class Feed extends Component {
               <Loader />
             </div>
           )}
-          {this.state.posts.length <= 0 && !this.state.postsLoading ? (
-            <p style={{ textAlign: 'center' }}>No posts found.</p>
-          ) : null}
+          {this.state.posts.length <= 0 && !this.state.postsLoading ? <p style={{ textAlign: 'center' }}>No posts found.</p> : null}
           {!this.state.postsLoading && (
-            <Paginator
-              onPrevious={this.loadPosts.bind(this, 'previous')}
-              onNext={this.loadPosts.bind(this, 'next')}
-              lastPage={Math.ceil(this.state.totalPosts / 2)}
-              currentPage={this.state.postPage}
-            >
+            <Paginator onPrevious={this.loadPosts.bind(this, 'previous')} onNext={this.loadPosts.bind(this, 'next')} lastPage={Math.ceil(this.state.totalPosts / 2)} currentPage={this.state.postPage}>
               {this.state.posts.map(post => (
-                <Post
-                  key={post._id}
-                  id={post._id}
-                  author={post.creator.name}
-                  date={new Date(post.createdAt).toLocaleDateString('en-US')}
-                  title={post.title}
-                  image={post.imageUrl}
-                  content={post.content}
-                  onStartEdit={this.startEditPostHandler.bind(this, post._id)}
-                  onDelete={this.deletePostHandler.bind(this, post._id)}
-                />
+                <Post key={post._id} id={post._id} author={post.creator.name} date={new Date(post.createdAt).toLocaleDateString('en-US')} title={post.title} image={post.imageUrl} content={post.content} onStartEdit={this.startEditPostHandler.bind(this, post._id)} onDelete={this.deletePostHandler.bind(this, post._id)} />
               ))}
             </Paginator>
           )}

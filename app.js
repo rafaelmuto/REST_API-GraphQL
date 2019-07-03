@@ -1,4 +1,4 @@
-console.log('==> starting api.js');
+console.log('==> starting app.js');
 
 // importing modules:
 const express = require('express');
@@ -59,7 +59,8 @@ app.use(
   '/graphql',
   graphqlHttp({
     schema: graphqlSchema,
-    rootValue: graphqlResolver
+    rootValue: graphqlResolver,
+    graphiql: true
   })
 );
 
