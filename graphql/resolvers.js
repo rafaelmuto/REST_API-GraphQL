@@ -19,6 +19,8 @@ module.exports = {
     }
     if (errors.length > 0) {
       const error = new Error('invalid input');
+      error.data = errors;
+      error.code = 422;
       throw error;
     }
 
