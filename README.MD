@@ -1,6 +1,6 @@
 # REST_API+GraphQL
 
-A application for a REST API and GraphQL server running on express.js.
+An application for a REST API and GraphQL server running on express.js.
 
 this app uses node.js, express, mongoose, socket.io, graphQl and offers REST api and GraphQl routes.
 
