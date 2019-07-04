@@ -79,8 +79,8 @@ app.use(
 );
 
 // REST-API Routes:
-app.use('/feed', feedRouter);
-app.use('/auth', authRouter);
+// app.use('/feed', feedRouter);
+// app.use('/auth', authRouter);
 
 // error route middleware:
 app.use((err, req, res, nxt) => {
