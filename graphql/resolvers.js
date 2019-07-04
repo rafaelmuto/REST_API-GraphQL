@@ -59,6 +59,19 @@ module.exports = {
   },
 
   createPost: async function({ postInput }, req) {
+    if (!req.isAuth) {
+      const error = new Error('not authenticated!');
+      error.code = 401;
+      throw error;
+    }
+
+    const user = await userModel.findById(req.userId);
+    if (!user) {
+      const error = new Error('invalid user');
+      error.code = 401;
+      throw error;
+    }
+
     const errors = [];
     if (validator.isEmpty(postInput.title) || !validator.isLength(postInput.title, { min: 5 })) {
       errors.push({ message: 'title is invalid' });
@@ -76,10 +89,11 @@ module.exports = {
     const post = new postModel({
       title: postInput.title,
       content: postInput.content,
-      imageUrl: postInput.imageUrl
+      imageUrl: postInput.imageUrl,
+      creator: user
     });
     const createdPost = await post.save();
-    // add post to user post
+    user.posts.push(createdPost);
 
     return { ...createdPost._doc, _id: createdPost._id.toString(), createdAt: createdPost.createdAt.toISOString(), updatedAt: createdPost.updatedAt.toISOString() };
   }

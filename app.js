@@ -14,6 +14,7 @@ const feedRouter = require('./routes/feedRouter');
 const authRouter = require('./routes/authRouter');
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolver = require('./graphql/resolvers');
+const auth = require('./middlewares/auth');
 
 // initilzing express.js:
 const app = express();
@@ -58,6 +59,7 @@ app.use((req, res, nxt) => {
 });
 
 // GraphQL Route:
+app.use(auth);
 app.use(
   '/graphql',
   graphqlHttp({
