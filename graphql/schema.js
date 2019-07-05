@@ -8,7 +8,7 @@ module.exports = buildSchema(`
         content: String!
         imageUrl: String!
         creator: User!
-        createAt: String!
+        createdAt: String!
         updatedAt: String!
     }
 
