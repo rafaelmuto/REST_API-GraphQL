@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const multer = require('multer');
 const graphqlHttp = require('express-graphql');
+const fs = require('fs');
 
 // importing resources:
 const SETUP = require('./SETUP');
@@ -58,8 +59,26 @@ app.use((req, res, nxt) => {
   nxt();
 });
 
+// REST-API Routes:
+// app.use('/feed', feedRouter);
+// app.use('/auth', authRouter);
+
 // GraphQL Route:
 app.use(auth);
+
+app.put('/post-image', (req, res, nxt) => {
+  if (!req.isAuth) {
+    throw new Error('not authenticated');
+  }
+  if (!req.file) {
+    return res.status(200).json({ message: 'no file uploaded...' });
+  }
+  if (req.body.oldPath) {
+    clearImage(req.body.oldPath);
+  }
+  return res.status(201).json({ message: 'file stored', filePath: req.file.path });
+});
+
 app.use(
   '/graphql',
   graphqlHttp({
@@ -78,10 +97,6 @@ app.use(
     }
   })
 );
-
-// REST-API Routes:
-// app.use('/feed', feedRouter);
-// app.use('/auth', authRouter);
 
 // error route middleware:
 app.use((err, req, res, nxt) => {
@@ -104,3 +119,8 @@ mongoose
     });
   })
   .catch(err => console.log(err));
+
+const clearImage = filePath => {
+  filePath = path.join(__dirname, '..', filePath);
+  fs.unlink(filePath, err => console.log(err));
+};
