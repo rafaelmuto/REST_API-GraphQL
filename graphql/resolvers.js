@@ -97,5 +97,24 @@ module.exports = {
     await user.save();
 
     return { ...createdPost._doc, _id: createdPost._id.toString(), createdAt: createdPost.createdAt.toISOString(), updatedAt: createdPost.updatedAt.toISOString() };
+  },
+
+  posts: async function(args, req) {
+    if (!req.isAuth) {
+      const error = new Error('not authenticated!');
+      error.code = 401;
+      throw error;
+    }
+
+    const totalPosts = await postModel.find().countDocuments();
+    const posts = await postModel
+      .find()
+      .sort({ createdAt: -1 })
+      .populate('creator');
+    const nomalizedPosts = posts.map(p => {
+      return { ...p._doc, _id: p._id.toString(), createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString() };
+    });
+
+    return { posts: nomalizedPosts, totalPosts: totalPosts };
   }
 };
