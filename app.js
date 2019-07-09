@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const multer = require('multer');
 const graphqlHttp = require('express-graphql');
-const fs = require('fs');
+const { clearImage } = require('./Util/file');
 
 // importing resources:
 const SETUP = require('./SETUP');
@@ -119,8 +119,3 @@ mongoose
     });
   })
   .catch(err => console.log(err));
-
-const clearImage = filePath => {
-  filePath = path.join(__dirname, '..', filePath);
-  fs.unlink(filePath, err => console.log(err));
-};
