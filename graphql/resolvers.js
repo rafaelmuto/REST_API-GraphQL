@@ -122,5 +122,26 @@ module.exports = {
     });
 
     return { posts: nomalizedPosts, totalPosts: totalPosts };
+  },
+
+  post: async function({ id }, req) {
+    if (!req.isAuth) {
+      const error = new Error('not authenticated!');
+      error.code = 401;
+      throw error;
+    }
+
+    const post = await postModel.findById(id).populate('creator');
+    if (!post) {
+      const error = new Error('no post found');
+      error.code = 404;
+      throw error;
+    }
+    return {
+      ...post._doc,
+      _id: post._id.toString(),
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString()
+    };
   }
 };
