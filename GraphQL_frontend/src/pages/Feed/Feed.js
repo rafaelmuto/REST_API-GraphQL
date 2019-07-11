@@ -24,11 +24,11 @@ class Feed extends Component {
   componentDidMount() {
     const graphqlQuery = {
       query: `
-        {
-          user {
-            status
+      {
+            user {
+              status
+            }
           }
-        }
       `
     };
 
@@ -261,18 +261,23 @@ class Feed extends Component {
 
         this.setState(prevState => {
           let updatedPosts = [...prevState.posts];
+          let updatedTotalPosts = prevState.totalPosts;
           if (prevState.editPost) {
             const postIndex = prevState.posts.findIndex(p => p._id === prevState.editPost._id);
             updatedPosts[postIndex] = post;
           } else {
-            updatedPosts.pop();
+            updatedTotalPosts++;
+            if (prevState.posts.length >= 2) {
+              updatedPosts.pop();
+            }
             updatedPosts.unshift(post);
           }
           return {
             posts: updatedPosts,
             isEditing: false,
             editPost: null,
-            editLoading: false
+            editLoading: false,
+            totalPosts: updatedTotalPosts
           };
         });
       })
