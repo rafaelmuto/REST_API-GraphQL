@@ -37,37 +37,36 @@ exports.signup = (req, res, nxt) => {
     });
 };
 
-exports.login = (req, res, nxt) => {
+exports.login = async (req, res, nxt) => {
   const email = req.body.email;
   const password = req.body.password;
   let loadedUser;
 
-  userModel
-    .findOne({ email: email })
-    .then(user => {
-      if (!user) {
-        const error = new Error('a user with this email could not be found.');
-        error.statusCode = 401;
-        throw error;
-      }
-      loadedUser = user;
-      return bcrypt.compare(password, user.password);
-    })
-    .then(isEqual => {
-      if (!isEqual) {
-        const error = new Error('Wrong password');
-        error.statusCode = 401;
-        throw error;
-      }
-      const token = jwt.sign({ email: loadedUser.email, userId: loadedUser._id.toString() }, 'secret_word', { expiresIn: '1h' });
-      res.status(200).json({ token: token, userId: loadedUser._id.toString() });
-    })
-    .catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      nxt(err);
-    });
+  try {
+    const user = await userModel.findOne({ email: email });
+    if (!user) {
+      const error = new Error('a user with this email could not be found.');
+      error.statusCode = 401;
+      throw error;
+    }
+    loadedUser = user;
+    const isEqual = await bcrypt.compare(password, user.password);
+
+    if (!isEqual) {
+      const error = new Error('Wrong password');
+      error.statusCode = 401;
+      throw error;
+    }
+    const token = jwt.sign({ email: loadedUser.email, userId: loadedUser._id.toString() }, 'secret_word', { expiresIn: '1h' });
+    res.status(200).json({ token: token, userId: loadedUser._id.toString() });
+    return;
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    nxt(err);
+    return err;
+  }
 };
 
 exports.getStatus = (req, res, nxt) => {
