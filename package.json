@@ -4,7 +4,7 @@
   "description": "api for nodejs full stack app",
   "main": "api.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --timeout 5000 --exit",
     "start": "nodemon app.js"
   },
   "author": "rafaelmuto",

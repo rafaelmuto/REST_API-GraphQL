@@ -69,27 +69,25 @@ exports.login = async (req, res, nxt) => {
   }
 };
 
-exports.getStatus = (req, res, nxt) => {
-  console.log('==> feedController: getStatus');
+exports.getStatus = async (req, res, nxt) => {
+  console.log('==> authController: getStatus');
 
   const userId = req.userId;
-
-  userModel
-    .findById(userId)
-    .then(user => {
-      if (!user) {
-        const error = new Error('user not found!');
-        error.statusCode = 404;
-        throw error;
-      }
-      res.status(200).json({ message: 'user status successfully recovered', status: user.status });
-    })
-    .catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      nxt(err);
-    });
+  try {
+    const user = await userModel.findById(userId);
+    if (!user) {
+      const error = new Error('user not found!');
+      error.statusCode = 404;
+      throw error;
+    }
+    return res.status(200).json({ message: 'user status successfully recovered', status: user.status });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    nxt(err);
+    return err;
+  }
 };
 
 exports.updateStatus = (req, res, nxt) => {
